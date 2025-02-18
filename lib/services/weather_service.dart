@@ -1,4 +1,4 @@
-import 'dart:convert';
+/* import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
@@ -54,6 +54,35 @@ class WeatherProvider extends ChangeNotifier {
       return city ?? "";
     } catch (e) {
       throw Exception('Error fetching city');
+    }
+  }
+} */
+
+import 'dart:convert';
+import 'package:flutter/foundation.dart';
+import 'package:http/http.dart' as http;
+
+import '../models/weather_model.dart';
+
+class WeatherProvider extends ChangeNotifier {
+  static const BASE_URL = "https://api.openweathermap.org/data/2.5/weather";
+  final String apiKey;
+
+  Weather? _lastFetchedWeather;
+  Weather? get lastFetchedWheater => _lastFetchedWeather;
+
+  WeatherProvider({required this.apiKey});
+
+  // Cambia esta función para aceptar el nombre de la ciudad como parámetro
+  Future fetchWeatherForCity(String cityName) async {
+    final url = '$BASE_URL?q=$cityName&appid=$apiKey&units=metric';
+    final response = await http.get(Uri.parse(url));
+
+    if (response.statusCode == 200) {
+      _lastFetchedWeather = Weather.fromJson(jsonDecode(response.body));
+      notifyListeners();
+    } else {
+      throw Exception('Error fetching weather data');
     }
   }
 }
